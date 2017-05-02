@@ -207,6 +207,21 @@ class FacetWP_Facet_Color
 ?>
         <tr>
             <td>
+                <?php _e('Behavior', 'fwp'); ?>:
+                <div class="facetwp-tooltip">
+                    <span class="icon-question">?</span>
+                    <div class="facetwp-tooltip-content"><?php _e( 'How should multiple selections affect the results?', 'fwp' ); ?></div>
+                </div>
+            </td>
+            <td>
+                <select class="facet-operator">
+                    <option value="and"><?php _e( 'Narrow the result set', 'fwp' ); ?></option>
+                    <option value="or"><?php _e( 'Widen the result set', 'fwp' ); ?></option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>
                 <?php _e('Count', 'fwp'); ?>:
                 <div class="facetwp-tooltip">
                     <span class="icon-question">?</span>
