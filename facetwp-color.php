@@ -122,11 +122,13 @@ class FacetWP_Facet_Color
     wp.hooks.addAction('facetwp/load/color', function($this, obj) {
         $this.find('.facet-source').val(obj.source);
         $this.find('.facet-count').val(obj.count);
+        $this.find('.facet-operator').val(obj.operator);
     });
 
     wp.hooks.addFilter('facetwp/save/color', function($this, obj) {
         obj['source'] = $this.find('.facet-source').val();
         obj['count'] = $this.find('.facet-count').val();
+        obj['operator'] = $this.find('.facet-operator').val();
         return obj;
     });
 
