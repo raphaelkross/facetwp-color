@@ -43,6 +43,32 @@ class FacetWP_Facet_Color
         // Sort by depth just in case
         $orderby = "f.depth, $orderby";
 
+        // Properly handle "OR" facets
+        if ( 'or' == $facet['operator'] ) {
+
+            // Apply filtering (ignore the facet's current selections)
+            if ( isset( FWP()->or_values ) && ( 1 < count( FWP()->or_values ) || ! isset( FWP()->or_values[ $facet['name'] ] ) ) ) {
+                $post_ids = array();
+                $or_values = FWP()->or_values; // Preserve the original
+                unset( $or_values[ $facet['name'] ] );
+
+                $counter = 0;
+                foreach ( $or_values as $name => $vals ) {
+                    $post_ids = ( 0 == $counter ) ? $vals : array_intersect( $post_ids, $vals );
+                    $counter++;
+                }
+
+                // Return only applicable results
+                $post_ids = array_intersect( $post_ids, FWP()->unfiltered_post_ids );
+            }
+            else {
+                $post_ids = FWP()->unfiltered_post_ids;
+            }
+
+            $post_ids = empty( $post_ids ) ? array( 0 ) : $post_ids;
+            $where_clause = ' AND post_id IN (' . implode( ',', $post_ids ) . ')';
+        }
+
         // Limit
         $limit = ctype_digit( $facet['count'] ) ? $facet['count'] : 10;
         $orderby = apply_filters( 'facetwp_facet_orderby', $orderby, $facet );
@@ -99,6 +125,24 @@ class FacetWP_Facet_Color
             $facet['name']
         );
 
+        // Match ALL values
+        if ( 'and' == $facet['operator'] ) {
+            foreach ( $selected_values as $key => $value ) {
+                $results = facetwp_sql( $sql . " AND facet_value IN ('$value')", $facet );
+                $output = ( $key > 0 ) ? array_intersect( $output, $results ) : $results;
+
+                if ( empty( $output ) ) {
+                    break;
+                }
+            }
+        }
+        // Match ANY value
+        else {
+            $selected_values = implode( "','", $selected_values );
+            $output = facetwp_sql( $sql . " AND facet_value IN ('$selected_values')", $facet );
+        }
+
+        /*
         foreach ( $selected_values as $key => $value ) {
             $results = $wpdb->get_col( $sql . " AND facet_value IN ('$value')" );
             $output = ( $key > 0 ) ? array_intersect( $output, $results ) : $results;
@@ -107,6 +151,7 @@ class FacetWP_Facet_Color
                 break;
             }
         }
+        */
 
         return $output;
     }
