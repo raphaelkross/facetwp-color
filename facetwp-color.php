@@ -142,17 +142,6 @@ class FacetWP_Facet_Color
             $output = facetwp_sql( $sql . " AND facet_value IN ('$selected_values')", $facet );
         }
 
-        /*
-        foreach ( $selected_values as $key => $value ) {
-            $results = $wpdb->get_col( $sql . " AND facet_value IN ('$value')" );
-            $output = ( $key > 0 ) ? array_intersect( $output, $results ) : $results;
-
-            if ( empty( $output ) ) {
-                break;
-            }
-        }
-        */
-
         return $output;
     }
 
